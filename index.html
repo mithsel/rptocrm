@@ -1,0 +1,2296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPTO CRM - Remote Pilot Training Organization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #1976D2;
+            --secondary-color: #FF9800;
+            --success-color: #4CAF50;
+            --warning-color: #FFC107;
+            --error-color: #F44336;
+            --bg-color: #F5F5F5;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --card-bg: #FFFFFF;
+            --border-color: #E0E0E0;
+            --sidebar-bg: #FFFFFF;
+            --header-height: 60px;
+            --sidebar-width: 250px;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #42A5F5;
+            --secondary-color: #FFB74D;
+            --success-color: #66BB6A;
+            --warning-color: #FFCA28;
+            --error-color: #EF5350;
+            --bg-color: #1A1A1A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B0B0B0;
+            --card-bg: #2D2D2D;
+            --border-color: #404040;
+            --sidebar-bg: #242424;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Login Page */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .login-box {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo h1 {
+            color: var(--primary-color);
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .login-logo p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .password-field {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .remember-forgot a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Main Layout */
+        .app-container {
+            display: none;
+        }
+
+        .app-container.active {
+            display: flex;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            display: none;
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .header-logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .search-box {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 300px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+        }
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            font-size: 20px;
+            padding: 8px;
+            border-radius: 50%;
+            background: var(--bg-color);
+        }
+
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--error-color);
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 10px;
+        }
+
+        .profile-menu {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: var(--header-height);
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--header-height));
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            transition: transform 0.3s;
+            z-index: 99;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-menu li:hover {
+            background: var(--bg-color);
+        }
+
+        .sidebar-menu li.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 24px;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* Dashboard */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .kpi-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .kpi-card h3 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .kpi-change {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .kpi-change.positive {
+            color: var(--success-color);
+        }
+
+        .kpi-change.negative {
+            color: var(--error-color);
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-card h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .table-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-bar select,
+        .filter-bar input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table thead {
+            background: var(--bg-color);
+        }
+
+        table th,
+        table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        table th {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        table tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-new { background: #FFF3E0; color: #E65100; }
+        .badge-contacted { background: #E3F2FD; color: #0D47A1; }
+        .badge-demo { background: #E8F5E9; color: #1B5E20; }
+        .badge-converted { background: #F3E5F5; color: #4A148C; }
+        .badge-lost { background: #FFEBEE; color: #B71C1C; }
+        .badge-active { background: #E8F5E9; color: #1B5E20; }
+        .badge-completed { background: #E3F2FD; color: #0D47A1; }
+        .badge-dropout { background: #FFEBEE; color: #B71C1C; }
+        .badge-suspended { background: #FFF3E0; color: #E65100; }
+        .badge-ongoing { background: #E8F5E9; color: #1B5E20; }
+        .badge-upcoming { background: #FFF3E0; color: #E65100; }
+        .badge-planning { background: #F5F5F5; color: #424242; }
+        .badge-paid { background: #E8F5E9; color: #1B5E20; }
+        .badge-pending { background: #FFF3E0; color: #E65100; }
+        .badge-overdue { background: #FFEBEE; color: #B71C1C; }
+        .badge-partial { background: #FFF3E0; color: #E65100; }
+
+        /* Action Buttons */
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-secondary {
+            background: var(--bg-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .tab:hover {
+            background: var(--bg-color);
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Detail Pages */
+        .detail-header {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .detail-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .info-item value {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Progress Bar */
+        .progress-tracker {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 40px 0;
+        }
+
+        .progress-tracker::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border-color);
+            z-index: 0;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .progress-step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .progress-step.completed .progress-step-circle {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .progress-step.current .progress-step-circle {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .progress-step-label {
+            font-size: 11px;
+            text-align: center;
+            max-width: 80px;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .batch-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            transition: box-shadow 0.3s;
+        }
+
+        .batch-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .batch-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .batch-card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .batch-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .batch-enrollment {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .search-box {
+                display: none;
+            }
+
+            .kpi-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+            }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--card-bg);
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-left: 4px solid var(--success-color);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.error {
+            border-left-color: var(--error-color);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 32px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .score-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .communication-item {
+            padding: 16px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .communication-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .payment-summary {
+            background: var(--bg-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .payment-summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .payment-summary-item.total {
+            font-weight: 700;
+            font-size: 20px;
+            padding-top: 12px;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .attendance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 8px;
+        }
+
+        .attendance-day {
+            padding: 12px;
+            text-align: center;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 12px;
+        }
+
+        .attendance-day.present {
+            background: #E8F5E9;
+            border-color: var(--success-color);
+        }
+
+        .attendance-day.absent {
+            background: #FFEBEE;
+            border-color: var(--error-color);
+        }
+
+        .settings-section {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .settings-section h3 {
+            margin-bottom: 20px;
+        }
+
+        .integration-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .integration-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-dot.active {
+            background: var(--success-color);
+        }
+
+        .status-dot.inactive {
+            background: var(--error-color);
+        }
+
+        .template-list {
+            list-style: none;
+        }
+
+        .template-item {
+            padding: 16px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-container" id="loginPage">
+        <div class="login-box">
+            <div class="login-logo">
+                <h1>RPTO</h1>
+                <p>Remote Pilot Training Organization CRM</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email / Username</label>
+                    <input type="text" id="username" placeholder="Enter your email or username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="password-field">
+                        <input type="password" id="password" placeholder="Enter your password" required>
+                        <span class="password-toggle" onclick="togglePassword()">Show</span>
+                    </div>
+                </div>
+                <div class="remember-forgot">
+                    <label>
+                        <input type="checkbox" id="rememberMe"> Remember Me
+                    </label>
+                    <a href="#">Forgot Password?</a>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="app-container" id="appContainer">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
+                <div class="header-logo">RPTO CRM</div>
+                <input type="text" class="search-box" placeholder="Search...">
+            </div>
+            <div class="header-right">
+                <div class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</div>
+                <div class="notification-icon">
+                    🔔
+                    <span class="notification-badge">5</span>
+                </div>
+                <div class="profile-menu" onclick="toggleProfileMenu()">
+                    <div class="profile-avatar">AD</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-menu">
+                <li class="active" onclick="navigate('dashboard')">📊 Dashboard</li>
+                <li onclick="navigate('leads')">👥 Leads</li>
+                <li onclick="navigate('students')">🎓 Students</li>
+                <li onclick="navigate('batches')">📚 Batches</li>
+                <li onclick="navigate('payments')">💰 Payments</li>
+                <li onclick="navigate('dgca')">📋 DGCA Workflow</li>
+                <li onclick="navigate('reports')">📈 Reports</li>
+                <li onclick="navigate('settings')">⚙️ Settings</li>
+                <li onclick="logout()" style="color: var(--error-color);">🚪 Logout</li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Pages will be dynamically loaded here -->
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Sample Data
+        const sampleData = {
+            leads: [
+                { id: 'LEAD001', name: 'John Doe', phone: '9876543210', email: 'john@email.com', status: 'new', source: 'website', score: 75, assigned_to: 'Sarah Khan', created_date: '2025-01-10' },
+                { id: 'LEAD002', name: 'Jane Smith', phone: '9876543211', email: 'jane@email.com', status: 'contacted', source: 'phone', score: 85, assigned_to: 'Mike Johnson', created_date: '2025-01-09' },
+                { id: 'LEAD003', name: 'Rahul Verma', phone: '9876543212', email: 'rahul@email.com', status: 'demo', source: 'referral', score: 90, assigned_to: 'Sarah Khan', created_date: '2025-01-08' },
+                { id: 'LEAD004', name: 'Priya Patel', phone: '9876543213', email: 'priya@email.com', status: 'converted', source: 'advertisement', score: 95, assigned_to: 'Mike Johnson', created_date: '2025-01-07' },
+            ],
+            students: [
+                { id: 'STU202501', name: 'Amit Kumar', student_id: 'STU2025001', phone: '9988776655', email: 'amit@email.com', batch: 'SMALL-JAN-2025', status: 'active', enrollment_date: '2025-01-05', course: 'Small Category (2-25kg)', dgca_stage: 'theory_training', payment_status: 'partial', paid_amount: 35000, total_fee: 50000 },
+                { id: 'STU202502', name: 'Neha Singh', student_id: 'STU2025002', phone: '9988776656', email: 'neha@email.com', batch: 'SMALL-JAN-2025', status: 'active', enrollment_date: '2025-01-05', course: 'Small Category (2-25kg)', dgca_stage: 'theory_exam', payment_status: 'paid', paid_amount: 50000, total_fee: 50000 },
+                { id: 'STU202503', name: 'Rohit Gupta', student_id: 'STU2025003', phone: '9988776657', email: 'rohit@email.com', batch: 'SMALL-FEB-2025', status: 'active', enrollment_date: '2025-01-15', course: 'Small Category (2-25kg)', dgca_stage: 'enrollment', payment_status: 'partial', paid_amount: 25000, total_fee: 50000 },
+            ],
+            batches: [
+                { id: 'BATCH001', name: 'SMALL-JAN-2025', course: 'Small Category', start_date: '2025-01-20', end_date: '2025-03-20', capacity: 25, enrolled: 12, status: 'ongoing', instructor: 'Rajesh Singh' },
+                { id: 'BATCH002', name: 'SMALL-FEB-2025', course: 'Small Category', start_date: '2025-02-10', end_date: '2025-04-10', capacity: 25, enrolled: 5, status: 'upcoming', instructor: 'Priya Sharma' },
+                { id: 'BATCH003', name: 'SMALL-MAR-2025', course: 'Small Category', start_date: '2025-03-05', end_date: '2025-05-05', capacity: 25, enrolled: 0, status: 'planning', instructor: 'Not Assigned' },
+            ],
+            payments: [
+                { id: 'PAY001', student_id: 'STU202501', name: 'Amit Kumar', amount: 15000, date: '2025-01-10', method: 'UPI', status: 'paid' },
+                { id: 'PAY002', student_id: 'STU202501', name: 'Amit Kumar', amount: 20000, date: '2025-01-05', method: 'Cash', status: 'paid' },
+                { id: 'PAY003', student_id: 'STU202503', name: 'Rohit Gupta', amount: 25000, date: '2025-01-16', method: 'Bank Transfer', status: 'paid' },
+            ],
+            dgca_stages: [
+                { stage: 'enrollment', label: 'Enrollment & Documents', position: 0 },
+                { stage: 'theory_training', label: 'Theory Training', position: 1 },
+                { stage: 'theory_exam', label: 'Theory Exam', position: 2 },
+                { stage: 'simulator_training', label: 'Simulator Training', position: 3 },
+                { stage: 'practical_training', label: 'Practical Training', position: 4 },
+                { stage: 'skill_test', label: 'Skill Test', position: 5 },
+                { stage: 'documentation', label: 'Documentation', position: 6 },
+                { stage: 'rpc_application', label: 'RPC Application', position: 7 },
+                { stage: 'rpc_issued', label: 'RPC Issued', position: 8 },
+            ],
+            templates: [
+                { id: 'TMPL001', name: 'Payment Reminder', channel: 'whatsapp', message: 'Hi {{name}}, your payment of ₹{{amount}} is due on {{date}}. Please pay soon.' },
+                { id: 'TMPL002', name: 'Welcome Message', channel: 'email', message: 'Welcome to RPTO CRM, {{name}}! Your enrollment is confirmed.' },
+                { id: 'TMPL003', name: 'Demo Reminder', channel: 'sms', message: 'Hi {{name}}, reminder: Your demo is scheduled for {{date}} at {{time}}.' },
+            ]
+        };
+
+        // State Management
+        let currentUser = null;
+        let currentPage = 'dashboard';
+        let currentTheme = 'light';
+        let selectedLead = null;
+        let selectedStudent = null;
+
+        // Login Function
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Simulate login
+            if (username && password) {
+                currentUser = { username: username, name: 'Admin User' };
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('appContainer').classList.add('active');
+                navigate('dashboard');
+                showToast('Login successful!', 'success');
+            }
+        });
+
+        // Toggle Password Visibility
+        function togglePassword() {
+            const passwordField = document.getElementById('password');
+            const toggle = document.querySelector('.password-toggle');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggle.textContent = 'Hide';
+            } else {
+                passwordField.type = 'password';
+                toggle.textContent = 'Show';
+            }
+        }
+
+        // Toggle Theme
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            document.getElementById('themeToggle').textContent = currentTheme === 'light' ? '🌙' : '☀️';
+        }
+
+        // Toggle Sidebar (Mobile)
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // Toggle Profile Menu
+        function toggleProfileMenu() {
+            showToast('Profile menu clicked', 'info');
+        }
+
+        // Logout
+        function logout() {
+            currentUser = null;
+            document.getElementById('appContainer').classList.remove('active');
+            document.getElementById('loginPage').style.display = 'flex';
+            showToast('Logged out successfully', 'success');
+        }
+
+        // Navigation
+        function navigate(page, data = null) {
+            currentPage = page;
+            
+            // Update active menu item
+            document.querySelectorAll('.sidebar-menu li').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const pages = {
+                'dashboard': renderDashboard,
+                'leads': renderLeads,
+                'lead-detail': () => renderLeadDetail(data),
+                'students': renderStudents,
+                'student-detail': () => renderStudentDetail(data),
+                'batches': renderBatches,
+                'payments': renderPayments,
+                'dgca': renderDGCA,
+                'reports': renderReports,
+                'settings': renderSettings
+            };
+            
+            if (pages[page]) {
+                pages[page]();
+            }
+        }
+
+        // Dashboard Page
+        function renderDashboard() {
+            const content = `
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                    <select class="btn btn-secondary">
+                        <option>Last 30 Days</option>
+                        <option>Last 7 Days</option>
+                        <option>Last 90 Days</option>
+                    </select>
+                </div>
+
+                <div class="kpi-cards">
+                    <div class="kpi-card">
+                        <h3>Total Leads</h3>
+                        <div class="kpi-value">156</div>
+                        <div class="kpi-change positive">▲ +23 this month</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Active Students</h3>
+                        <div class="kpi-value">89</div>
+                        <div class="kpi-change positive">▲ +12 this month</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Total Revenue</h3>
+                        <div class="kpi-value">₹12.5L</div>
+                        <div class="kpi-change positive">▲ +15% this month</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Active Batches</h3>
+                        <div class="kpi-value">12</div>
+                        <div class="kpi-change">Currently running</div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <h3>Lead Conversion Funnel</h3>
+                        <div class="chart-container">
+                            <canvas id="leadFunnelChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Revenue Trend</h3>
+                        <div class="chart-container">
+                            <canvas id="revenueTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <h3>Upcoming Batches</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Batch Name</th>
+                                    <th>Start Date</th>
+                                    <th>Enrollment</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${sampleData.batches.map(batch => `
+                                    <tr>
+                                        <td>${batch.name}</td>
+                                        <td>${batch.start_date}</td>
+                                        <td>${batch.enrolled}/${batch.capacity}</td>
+                                        <td><span class="badge badge-${batch.status}">${batch.status}</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Recent Activities</h3>
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            <div class="communication-item">
+                                <div class="communication-item-header">
+                                    <span>New lead added</span>
+                                    <span>2 hours ago</span>
+                                </div>
+                                <div>John Doe submitted inquiry form</div>
+                            </div>
+                            <div class="communication-item">
+                                <div class="communication-item-header">
+                                    <span>Payment received</span>
+                                    <span>5 hours ago</span>
+                                </div>
+                                <div>₹15,000 from Amit Kumar</div>
+                            </div>
+                            <div class="communication-item">
+                                <div class="communication-item-header">
+                                    <span>Batch started</span>
+                                    <span>1 day ago</span>
+                                </div>
+                                <div>SMALL-JAN-2025 training commenced</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('mainContent').innerHTML = content;
+            
+            // Initialize Charts
+            setTimeout(() => {
+                initLeadFunnelChart();
+                initRevenueTrendChart();
+            }, 100);
+        }
+
+        // Leads Page
+        function renderLeads() {
+            const content = `
+                <div class="page-header">
+                    <h1 class="page-title">Leads Management</h1>
+                    <button class="btn btn-primary" onclick="showToast('Add Lead clicked', 'info')">+ Add Lead</button>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="filter-bar">
+                            <select>
+                                <option>All Status</option>
+                                <option>New</option>
+                                <option>Contacted</option>
+                                <option>Demo</option>
+                                <option>Converted</option>
+                            </select>
+                            <select>
+                                <option>All Sources</option>
+                                <option>Website</option>
+                                <option>Phone</option>
+                                <option>Referral</option>
+                            </select>
+                            <input type="text" placeholder="Search leads...">
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Score</th>
+                                <th>Source</th>
+                                <th>Assigned To</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sampleData.leads.map(lead => `
+                                <tr>
+                                    <td>${lead.id}</td>
+                                    <td>${lead.name}</td>
+                                    <td>${lead.phone}</td>
+                                    <td><span class="badge badge-${lead.status}">${lead.status}</span></td>
+                                    <td>${lead.score}</td>
+                                    <td>${lead.source}</td>
+                                    <td>${lead.assigned_to}</td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="btn btn-sm btn-primary" onclick="viewLead('${lead.id}')">View</button>
+                                            <button class="btn btn-sm btn-secondary" onclick="showToast('Edit clicked', 'info')">Edit</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            document.getElementById('mainContent').innerHTML = content;
+        }
+
+        // Lead Detail Page
+        function viewLead(leadId) {
+            const lead = sampleData.leads.find(l => l.id === leadId);
+            navigate('lead-detail', lead);
+        }
+
+        function renderLeadDetail(lead) {
+            if (!lead) return;
+            
+            const content = `
+                <div class="back-btn" onclick="navigate('leads')">← Back to Leads</div>
+                
+                <div class="detail-header">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px;">
+                        <div>
+                            <h2>${lead.name}</h2>
+                            <p style="color: var(--text-secondary);">${lead.email} • ${lead.phone}</p>
+                        </div>
+                        <div class="score-indicator">
+                            Lead Score: ${lead.score}/100
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                        <span class="badge badge-${lead.status}">${lead.status}</span>
+                        <span class="badge badge-info">Source: ${lead.source}</span>
+                    </div>
+                    <div class="action-btns">
+                        <button class="btn btn-success" onclick="showToast('Converting to student...', 'success')">Convert to Student</button>
+                        <button class="btn btn-primary" onclick="showToast('Demo scheduled', 'success')">Schedule Demo</button>
+                        <button class="btn btn-secondary" onclick="showToast('Marked as lost', 'info')">Mark as Lost</button>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab(event, 'lead-tab-1')">Basic Info</div>
+                    <div class="tab" onclick="switchTab(event, 'lead-tab-2')">Communication</div>
+                    <div class="tab" onclick="switchTab(event, 'lead-tab-3')">Follow-ups</div>
+                    <div class="tab" onclick="switchTab(event, 'lead-tab-4')">Notes</div>
+                </div>
+
+                <div id="lead-tab-1" class="tab-content active">
+                    <div class="chart-card">
+                        <div class="detail-info">
+                            <div class="info-item">
+                                <label>Full Name</label>
+                                <value>${lead.name}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Email</label>
+                                <value>${lead.email}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Phone</label>
+                                <value>${lead.phone}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Source</label>
+                                <value>${lead.source}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Assigned To</label>
+                                <value>${lead.assigned_to}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Created Date</label>
+                                <value>${lead.created_date}</value>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="lead-tab-2" class="tab-content">
+                    <div class="chart-card">
+                        <h3>Communication History</h3>
+                        <div class="communication-item">
+                            <div class="communication-item-header">
+                                <span>Email Sent</span>
+                                <span>2 days ago</span>
+                            </div>
+                            <div>Welcome email sent to ${lead.email}</div>
+                        </div>
+                        <div class="communication-item">
+                            <div class="communication-item-header">
+                                <span>Phone Call</span>
+                                <span>3 days ago</span>
+                            </div>
+                            <div>Initial contact call - Duration: 15 minutes</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="lead-tab-3" class="tab-content">
+                    <div class="chart-card">
+                        <h3>Scheduled Follow-ups</h3>
+                        <div class="communication-item">
+                            <div class="communication-item-header">
+                                <span>Demo Session</span>
+                                <span>Tomorrow, 2:00 PM</span>
+                            </div>
+                            <div>Virtual demo scheduled via Zoom</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="lead-tab-4" class="tab-content">
+                    <div class="chart-card">
+                        <h3>Internal Notes</h3>
+                        <textarea class="form-control" rows="5" placeholder="Add notes about this lead..."></textarea>
+                        <button class="btn btn-primary" style="margin-top: 12px;" onclick="showToast('Note saved', 'success')">Save Note</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('mainContent').innerHTML = content;
+        }
+
+        // Students Page
+        function renderStudents() {
+            const content = `
+                <div class="page-header">
+                    <h1 class="page-title">Students Management</h1>
+                    <button class="btn btn-primary" onclick="showToast('Add Student clicked', 'info')">+ Add Student</button>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="filter-bar">
+                            <select>
+                                <option>All Status</option>
+                                <option>Active</option>
+                                <option>Completed</option>
+                                <option>Dropout</option>
+                            </select>
+                            <select>
+                                <option>All Batches</option>
+                                <option>SMALL-JAN-2025</option>
+                                <option>SMALL-FEB-2025</option>
+                            </select>
+                            <input type="text" placeholder="Search students...">
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Batch</th>
+                                <th>Status</th>
+                                <th>Enrollment Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sampleData.students.map(student => `
+                                <tr>
+                                    <td>${student.student_id}</td>
+                                    <td>${student.name}</td>
+                                    <td>${student.phone}</td>
+                                    <td>${student.batch}</td>
+                                    <td><span class="badge badge-${student.status}">${student.status}</span></td>
+                                    <td>${student.enrollment_date}</td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="btn btn-sm btn-primary" onclick="viewStudent('${student.id}')">View</button>
+                                            <button class="btn btn-sm btn-secondary" onclick="showToast('Edit clicked', 'info')">Edit</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            document.getElementById('mainContent').innerHTML = content;
+        }
+
+        // Student Detail Page
+        function viewStudent(studentId) {
+            const student = sampleData.students.find(s => s.id === studentId);
+            navigate('student-detail', student);
+        }
+
+        function renderStudentDetail(student) {
+            if (!student) return;
+            
+            const content = `
+                <div class="back-btn" onclick="navigate('students')">← Back to Students</div>
+                
+                <div class="detail-header">
+                    <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                        <div class="profile-avatar" style="width: 80px; height: 80px; font-size: 32px;">
+                            ${student.name.charAt(0)}
+                        </div>
+                        <div>
+                            <h2>${student.name}</h2>
+                            <p style="color: var(--text-secondary);">${student.student_id} • ${student.email}</p>
+                            <p style="color: var(--text-secondary);">${student.phone}</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                        <span class="badge badge-${student.status}">${student.status}</span>
+                        <span class="badge badge-info">Batch: ${student.batch}</span>
+                        <span class="badge badge-${student.payment_status}">Payment: ${student.payment_status}</span>
+                    </div>
+                    <div class="action-btns">
+                        <button class="btn btn-secondary" onclick="showToast('Edit clicked', 'info')">Edit Profile</button>
+                        <button class="btn btn-primary" onclick="showToast('Documents viewed', 'info')">View Documents</button>
+                        <button class="btn btn-success" onclick="showToast('Record payment', 'info')">Record Payment</button>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab(event, 'student-tab-1')">Profile</div>
+                    <div class="tab" onclick="switchTab(event, 'student-tab-2')">KYC Documents</div>
+                    <div class="tab" onclick="switchTab(event, 'student-tab-3')">Payments</div>
+                    <div class="tab" onclick="switchTab(event, 'student-tab-4')">Attendance</div>
+                    <div class="tab" onclick="switchTab(event, 'student-tab-5')">Performance</div>
+                    <div class="tab" onclick="switchTab(event, 'student-tab-6')">DGCA Workflow</div>
+                </div>
+
+                <div id="student-tab-1" class="tab-content active">
+                    <div class="chart-card">
+                        <h3>Personal Information</h3>
+                        <div class="detail-info">
+                            <div class="info-item">
+                                <label>Full Name</label>
+                                <value>${student.name}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Student ID</label>
+                                <value>${student.student_id}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Email</label>
+                                <value>${student.email}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Phone</label>
+                                <value>${student.phone}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Course</label>
+                                <value>${student.course}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Enrollment Date</label>
+                                <value>${student.enrollment_date}</value>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="student-tab-2" class="tab-content">
+                    <div class="chart-card">
+                        <h3>KYC Documents</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Document Type</th>
+                                    <th>Status</th>
+                                    <th>Uploaded Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Aadhar Card</td>
+                                    <td><span class="badge badge-active">Verified</span></td>
+                                    <td>2025-01-05</td>
+                                    <td><button class="btn btn-sm btn-secondary">View</button></td>
+                                </tr>
+                                <tr>
+                                    <td>PAN Card</td>
+                                    <td><span class="badge badge-active">Verified</span></td>
+                                    <td>2025-01-05</td>
+                                    <td><button class="btn btn-sm btn-secondary">View</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Photo</td>
+                                    <td><span class="badge badge-active">Verified</span></td>
+                                    <td>2025-01-05</td>
+                                    <td><button class="btn btn-sm btn-secondary">View</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="student-tab-3" class="tab-content">
+                    <div class="chart-card">
+                        <h3>Payment Summary</h3>
+                        <div class="payment-summary">
+                            <div class="payment-summary-item">
+                                <span>Total Fee:</span>
+                                <span>₹${student.total_fee.toLocaleString()}</span>
+                            </div>
+                            <div class="payment-summary-item">
+                                <span>Amount Paid:</span>
+                                <span style="color: var(--success-color);">₹${student.paid_amount.toLocaleString()}</span>
+                            </div>
+                            <div class="payment-summary-item total">
+                                <span>Balance Due:</span>
+                                <span style="color: var(--error-color);">₹${(student.total_fee - student.paid_amount).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <h4 style="margin-top: 24px; margin-bottom: 16px;">Payment History</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                    <th>Status</th>
+                                    <th>Receipt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${sampleData.payments.filter(p => p.student_id === student.id).map(payment => `
+                                    <tr>
+                                        <td>${payment.date}</td>
+                                        <td>₹${payment.amount.toLocaleString()}</td>
+                                        <td>${payment.method}</td>
+                                        <td><span class="badge badge-${payment.status}">${payment.status}</span></td>
+                                        <td><button class="btn btn-sm btn-secondary">Download</button></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="student-tab-4" class="tab-content">
+                    <div class="chart-card">
+                        <h3>Attendance Overview</h3>
+                        <div class="payment-summary" style="margin-bottom: 24px;">
+                            <div class="payment-summary-item">
+                                <span>Total Classes:</span>
+                                <span>45</span>
+                            </div>
+                            <div class="payment-summary-item">
+                                <span>Present:</span>
+                                <span style="color: var(--success-color);">42</span>
+                            </div>
+                            <div class="payment-summary-item">
+                                <span>Attendance %:</span>
+                                <span style="color: var(--success-color); font-weight: 700;">93.3%</span>
+                            </div>
+                        </div>
+                        <h4 style="margin-bottom: 16px;">Recent Attendance</h4>
+                        <div class="attendance-grid">
+                            <div class="attendance-day present">Jan 15<br>✓</div>
+                            <div class="attendance-day present">Jan 14<br>✓</div>
+                            <div class="attendance-day present">Jan 13<br>✓</div>
+                            <div class="attendance-day absent">Jan 12<br>✗</div>
+                            <div class="attendance-day present">Jan 11<br>✓</div>
+                            <div class="attendance-day present">Jan 10<br>✓</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="student-tab-5" class="tab-content">
+                    <div class="chart-card">
+                        <h3>Performance Metrics</h3>
+                        <div class="detail-info">
+                            <div class="info-item">
+                                <label>Theory Marks</label>
+                                <value>85/100</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Practical Hours</label>
+                                <value>25/30</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Simulator Hours</label>
+                                <value>15/20</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Overall Grade</label>
+                                <value><span class="badge badge-active">A</span></value>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="student-tab-6" class="tab-content">
+                    <div class="chart-card">
+                        <h3>DGCA Licensing Progress</h3>
+                        <div class="progress-tracker">
+                            ${sampleData.dgca_stages.map((stage, index) => {
+                                const currentStageIndex = sampleData.dgca_stages.findIndex(s => s.stage === student.dgca_stage);
+                                let stepClass = '';
+                                if (index < currentStageIndex) stepClass = 'completed';
+                                if (index === currentStageIndex) stepClass = 'current';
+                                
+                                return `
+                                    <div class="progress-step ${stepClass}">
+                                        <div class="progress-step-circle">${index < currentStageIndex ? '✓' : index + 1}</div>
+                                        <div class="progress-step-label">${stage.label}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        <div style="text-align: center; margin-top: 24px;">
+                            <p style="font-size: 18px; font-weight: 600; margin-bottom: 12px;">
+                                Current Stage: ${sampleData.dgca_stages.find(s => s.stage === student.dgca_stage).label}
+                            </p>
+                            <button class="btn btn-primary">Update Progress</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('mainContent').innerHTML = content;
+        }
+
+        // Batches Page
+        function renderBatches() {
+            const content = `
+                <div class="page-header">
+                    <h1 class="page-title">Batch Management</h1>
+                    <button class="btn btn-primary" onclick="showToast('Create Batch clicked', 'info')">+ Create Batch</button>
+                </div>
+
+                <div class="filter-bar" style="margin-bottom: 24px;">
+                    <select>
+                        <option>All Status</option>
+                        <option>Ongoing</option>
+                        <option>Upcoming</option>
+                        <option>Planning</option>
+                    </select>
+                    <select>
+                        <option>All Courses</option>
+                        <option>Small Category</option>
+                    </select>
+                </div>
+
+                <div class="cards-grid">
+                    ${sampleData.batches.map(batch => `
+                        <div class="batch-card">
+                            <div class="batch-card-header">
+                                <div>
+                                    <div class="batch-card-title">${batch.name}</div>
+                                    <div style="color: var(--text-secondary); font-size: 14px;">${batch.course}</div>
+                                </div>
+                                <span class="badge badge-${batch.status}">${batch.status}</span>
+                            </div>
+                            <div class="batch-card-info">
+                                <div>📅 Start: ${batch.start_date}</div>
+                                <div>👨‍🏫 Instructor: ${batch.instructor}</div>
+                            </div>
+                            <div class="batch-enrollment">
+                                <span>${batch.enrolled}/${batch.capacity} seats</span>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill" style="width: ${(batch.enrolled/batch.capacity*100)}%"></div>
+                                </div>
+                            </div>
+                            <div class="action-btns" style="margin-top: 16px;">
+                                <button class="btn btn-sm btn-primary">View Details</button>
+                                <button class="btn btn-sm btn-secondary">Schedule</button>
+                                <button class="btn btn-sm btn-success">Enroll Student</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            document.getElementById('mainContent').innerHTML = content;
+        }
+
+        // Payments Page
+        function renderPayments() {
+            const totalCollected = sampleData.payments.reduce((sum, p) => sum + p.amount, 0);
+            const content = `
+                <div class="page-header">
+                    <h1 class="page-title">Payment Management</h1>
+                    <button class="btn btn-primary" onclick="showToast('Record Payment clicked', 'info')">+ Record Payment</button>
+                </div>
+
+                <div class="kpi-cards" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div class="kpi-card">
+                        <h3>Total Collected</h3>
+                        <div class="kpi-value" style="font-size: 24px;">₹${totalCollected.toLocaleString()}</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Pending</h3>
+                        <div class="kpi-value" style="font-size: 24px;">₹45,000</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Overdue</h3>
+                        <div class="kpi-value" style="font-size: 24px; color: var(--error-color);">₹15,000</div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="filter-bar">
+                            <select>
+                                <option>All Students</option>
+                            </select>
+                            <select>
+                                <option>All Status</option>
+                                <option>Paid</option>
+                                <option>Pending</option>
+                                <option>Overdue</option>
+                            </select>
+                            <input type="text" placeholder="Search payments...">
+                        </div>
+                        <button class="btn btn-warning">Send Reminders</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Receipt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sampleData.payments.map(payment => `
+                                <tr>
+                                    <td>${payment.id}</td>
+                                    <td>${payment.student_id}</td>
+                                    <td>${payment.name}</td>
+                                    <td>₹${payment.amount.toLocaleString()}</td>
+                                    <td>${payment.date}</td>
+                                    <td>${payment.method}</td>
+                                    <td><span class="badge badge-${payment.status}">${payment.status}</span></td>
+                                    <td><button class="btn btn-sm btn-secondary">Download</button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            document.getElementById('mainContent').innerHTML = content;
+        }
+
+        // DGCA Workflow Page
+        function renderDGCA() {
+            const content = `
+                <div class="page-header">
+                    <h1 class="page-title">DGCA Licensing Workflow</h1>
+                    <div class="filter-bar">
+                        <select>
+                            <option>All Stages</option>
+                            ${sampleData.dgca_stages.map(stage => `<option>${stage.label}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="cards-grid">
+                    ${sampleData.students.map(student => {
+                        const currentStage = sampleData.dgca_stages.find(s => s.stage === student.dgca_stage);
+                        const progress = ((currentStage.position + 1) / sampleData.dgca_stages.length * 100).toFixed(0);
+                        
+                        return `
+                            <div class="batch-card">
+                                <div class="batch-card-header">
+                                    <div>
+                                        <div class="batch-card-title">${student.name}</div>
+                                        <div style="color: var(--text-secondary); font-size: 14px;">${student.student_id}</div>
+                                    </div>
+                                    <span class="badge badge-info">${progress}%</span>
+                                </div>
+                                <div class="batch-card-info">
+                                    <div><strong>Current Stage:</strong></div>
+                                    <div>${currentStage.label}</div>
+                                </div>
+                                <div class="batch-enrollment">
+                                    <span>Progress</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" style="width: ${progress}%"></div>
+                                    </div>
+                                </div>
+                                <div class="action-btns" style="margin-top: 16px;">
+                                    <button class="btn btn-sm btn-primary" onclick="viewStudent('${student.id}')">View Details</button>
+                                    <button class="btn btn-sm btn-success" onclick="showToast('Progress updated', 'success')">Update Progress</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            
+            document.getElementById('mainContent').innerHTML = content;
+        }
+
+        // Reports Page
+        function renderReports() {
+            const content = `
+                <div class="page-header">
+                    <h1 class="page-title">Reports &amp; Analytics</h1>
+                    <div class="filter-bar">
+                        <select>
+                            <option>Lead Analytics</option>
+                            <option>Revenue Report</option>
+                            <option>Student Performance</option>
+                            <option>Batch Utilization</option>
+                        </select>
+                        <select>
+                            <option>Last 30 Days</option>
+                            <option>Last 90 Days</option>
+                            <option>This Year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="kpi-cards">
+                    <div class="kpi-card">
+                        <h3>Lead Conversion Rate</h3>
+                        <div class="kpi-value">33.3%</div>
+                        <div class="kpi-change positive">▲ +5% from last month</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Average Deal Value</h3>
+                        <div class="kpi-value">₹50,000</div>
+                        <div class="kpi-change">Stable</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Student Retention</h3>
+                        <div class="kpi-value">95%</div>
+                        <div class="kpi-change positive">▲ +2%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Batch Utilization</h3>
+                        <div class="kpi-value">68%</div>
+                        <div class="kpi-change negative">▼ -5%</div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <h3>Student Performance Distribution</h3>
+                        <div class="chart-container">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Batch Utilization</h3>
+                        <div class="chart-container">
+                            <canvas id="batchUtilizationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="export-buttons">
+                    <button class="btn btn-secondary" onclick="showToast('Exporting to PDF...', 'info')">📄 Export PDF</button>
+                    <button class="btn btn-secondary" onclick="showToast('Exporting to Excel...', 'info')">📊 Export Excel</button>
+                    <button class="btn btn-secondary" onclick="showToast('Exporting to CSV...', 'info')">📋 Export CSV</button>
+                </div>
+            `;
+            
+            document.getElementById('mainContent').innerHTML = content;
+            
+            setTimeout(() => {
+                initPerformanceChart();
+                initBatchUtilizationChart();
+            }, 100);
+        }
+
+        // Settings Page
+        function renderSettings() {
+            const content = `
+                <div class="page-header">
+                    <h1 class="page-title">Settings</h1>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab(event, 'settings-tab-1')">General</div>
+                    <div class="tab" onclick="switchTab(event, 'settings-tab-2')">Integrations</div>
+                    <div class="tab" onclick="switchTab(event, 'settings-tab-3')">Templates</div>
+                    <div class="tab" onclick="switchTab(event, 'settings-tab-4')">Automation</div>
+                </div>
+
+                <div id="settings-tab-1" class="tab-content active">
+                    <div class="settings-section">
+                        <h3>General Settings</h3>
+                        <div class="form-group">
+                            <label>System Name</label>
+                            <input type="text" class="form-control" value="RPTO CRM">
+                        </div>
+                        <div class="form-group">
+                            <label>Default Language</label>
+                            <select class="form-control">
+                                <option>English</option>
+                                <option>Hindi</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Currency</label>
+                            <select class="form-control">
+                                <option>INR (₹)</option>
+                                <option>USD ($)</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="showToast('Settings saved', 'success')">Save Changes</button>
+                    </div>
+                </div>
+
+                <div id="settings-tab-2" class="tab-content">
+                    <div class="settings-section">
+                        <h3>Integrations</h3>
+                        <div class="integration-item">
+                            <div>
+                                <div style="font-weight: 600;">WhatsApp Business API</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Send automated messages to students</div>
+                            </div>
+                            <div class="integration-status">
+                                <span class="status-dot active"></span>
+                                <span style="font-size: 14px;">Active</span>
+                            </div>
+                        </div>
+                        <div class="integration-item">
+                            <div>
+                                <div style="font-weight: 600;">Payment Gateway</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Process online payments</div>
+                            </div>
+                            <div class="integration-status">
+                                <span class="status-dot active"></span>
+                                <span style="font-size: 14px;">Active</span>
+                            </div>
+                        </div>
+                        <div class="integration-item">
+                            <div>
+                                <div style="font-weight: 600;">Cloud Storage</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Store documents securely</div>
+                            </div>
+                            <div class="integration-status">
+                                <span class="status-dot inactive"></span>
+                                <span style="font-size: 14px;">Inactive</span>
+                            </div>
+                        </div>
+                        <div class="integration-item">
+                            <div>
+                                <div style="font-weight: 600;">Email Service</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Send email notifications</div>
+                            </div>
+                            <div class="integration-status">
+                                <span class="status-dot active"></span>
+                                <span style="font-size: 14px;">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="settings-tab-3" class="tab-content">
+                    <div class="settings-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3>Message Templates</h3>
+                            <button class="btn btn-primary" onclick="showToast('Add Template clicked', 'info')">+ Add Template</button>
+                        </div>
+                        <ul class="template-list">
+                            ${sampleData.templates.map(template => `
+                                <li class="template-item">
+                                    <div>
+                                        <div style="font-weight: 600;">${template.name}</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">${template.message}</div>
+                                        <div style="margin-top: 8px;">
+                                            <span class="badge badge-info">${template.channel}</span>
+                                        </div>
+                                    </div>
+                                    <div class="action-btns">
+                                        <button class="btn btn-sm btn-secondary" onclick="showToast('Edit clicked', 'info')">Edit</button>
+                                        <button class="btn btn-sm btn-secondary" onclick="showToast('Deleted', 'success')">Delete</button>
+                                    </div>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="settings-tab-4" class="tab-content">
+                    <div class="settings-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3>Automation Rules</h3>
+                            <button class="btn btn-primary" onclick="showToast('Add Rule clicked', 'info')">+ Add Rule</button>
+                        </div>
+                        <div class="integration-item">
+                            <div>
+                                <div style="font-weight: 600;">Send Welcome Email</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Triggered when new student enrolls</div>
+                            </div>
+                            <label style="cursor: pointer;">
+                                <input type="checkbox" checked> Active
+                            </label>
+                        </div>
+                        <div class="integration-item">
+                            <div>
+                                <div style="font-weight: 600;">Payment Reminder</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Send 3 days before due date</div>
+                            </div>
+                            <label style="cursor: pointer;">
+                                <input type="checkbox" checked> Active
+                            </label>
+                        </div>
+                        <div class="integration-item">
+                            <div>
+                                <div style="font-weight: 600;">Demo Follow-up</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Send after demo session</div>
+                            </div>
+                            <label style="cursor: pointer;">
+                                <input type="checkbox"> Active
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('mainContent').innerHTML = content;
+        }
+
+        // Tab Switching
+        function switchTab(event, tabId) {
+            // Remove active class from all tabs and content
+            event.target.parentElement.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab and corresponding content
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Toast Notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show';
+            if (type === 'error') {
+                toast.classList.add('error');
+            }
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Chart Initialization Functions
+        function initLeadFunnelChart() {
+            const ctx = document.getElementById('leadFunnelChart');
+            if (!ctx) return;
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['New', 'Contacted', 'Demo', 'Converted'],
+                    datasets: [{
+                        data: [45, 35, 25, 15],
+                        backgroundColor: ['#1FB8CD', '#FFC185', '#B4413C', '#ECEBD5'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function initRevenueTrendChart() {
+            const ctx = document.getElementById('revenueTrendChart');
+            if (!ctx) return;
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: [250000, 300000, 280000, 350000, 400000, 450000],
+                        borderColor: '#1976D2',
+                        backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function initPerformanceChart() {
+            const ctx = document.getElementById('performanceChart');
+            if (!ctx) return;
+            
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Excellent (A)', 'Good (B)', 'Average (C)', 'Below Average (D)'],
+                    datasets: [{
+                        data: [35, 40, 20, 5],
+                        backgroundColor: ['#1FB8CD', '#FFC185', '#B4413C', '#ECEBD5'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function initBatchUtilizationChart() {
+            const ctx = document.getElementById('batchUtilizationChart');
+            if (!ctx) return;
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['SMALL-JAN-2025', 'SMALL-FEB-2025', 'SMALL-MAR-2025'],
+                    datasets: [{
+                        label: 'Utilization %',
+                        data: [48, 20, 0],
+                        backgroundColor: ['#1FB8CD', '#FFC185', '#B4413C'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize app
+        window.addEventListener('load', () => {
+            // Check if user is logged in (simulated)
+            const isLoggedIn = false; // Change to true to skip login
+            if (isLoggedIn) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('appContainer').classList.add('active');
+                navigate('dashboard');
+            }
+        });
+    </script>
+</body>
+</html>
